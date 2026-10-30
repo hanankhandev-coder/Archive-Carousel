@@ -1,0 +1,931 @@
+/* ==========================================================================
+   ARCHIVE — Single-Font Simple JS 3D Funnel Stylesheet
+   ========================================================================== */
+
+:root {
+  --bg-color: #080809;
+  --bg-elevated: rgba(8, 8, 9, 0.94);
+  --text-primary: #ffffff;
+  --text-secondary: #8a8a92;
+  --text-muted: #52525a;
+  --border-color: rgba(255, 255, 255, 0.14);
+  --card-placeholder: #161618;
+  --cursor-bg: #ffffff;
+  --cursor-text: #080809;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Full White Background in Light Mode */
+body.light-theme {
+  --bg-color: #ffffff;
+  --bg-elevated: rgba(255, 255, 255, 0.96);
+  --text-primary: #0a0a0c;
+  --text-secondary: #62626a;
+  --text-muted: #9898a0;
+  --border-color: rgba(0, 0, 0, 0.12);
+  --card-placeholder: #f0f0f2;
+  --cursor-bg: #0a0a0c;
+  --cursor-text: #ffffff;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ==========================================================================
+   1. Simple JS 3D Funnel Stage (Zero WebGL, Zero CSS 3D Upscaling Blur)
+   ========================================================================== */
+
+#webgl-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  overflow: hidden;
+  cursor: grab;
+}
+
+#webgl-container:active {
+  cursor: grabbing;
+}
+
+.funnel-viewport {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1800px;
+  perspective-origin: 50% 46%;
+  overflow: hidden;
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.funnel-viewport.is-backgrounded {
+  opacity: 0.06;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+.funnel-viewport.is-zoomed {
+  opacity: 0.18;
+}
+
+.funnel-world {
+  position: relative;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.funnel-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Native High-Resolution 3D Cylinder Card (100% Opaque - Never See-Through) */
+.ring-card {
+  position: absolute;
+  width: 236px;
+  left: -118px;
+  top: -128px;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  opacity: 1;
+  will-change: transform;
+}
+
+.ring-card-img-box {
+  position: relative;
+  width: 100%;
+  background: var(--bg-color);
+  overflow: hidden;
+  border-radius: 0px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+body.light-theme .ring-card-img-box {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.ring-card.aspect-4-5 .ring-card-img-box {
+  height: 214px;
+}
+
+.ring-card.aspect-1-1 .ring-card-img-box {
+  height: 192px;
+}
+
+.ring-card.aspect-3-4 .ring-card-img-box {
+  height: 224px;
+}
+
+.ring-card.is-hovered .ring-card-img-box {
+  transform: scale(1.04);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+}
+
+.ring-card-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Solid depth shade overlay (darkens far-back cards without making cards transparent) */
+.ring-card-shade {
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-color);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Razor-Sharp Left-Aligned Captions (Hidden when facing away on back of cylinder) */
+.ring-card-caption {
+  padding-top: 9px;
+  text-align: left;
+  pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.ring-card-title {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ring-card-sub {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   2. Unified Single-Font Top Header Bar
+   ========================================================================== */
+
+.ui-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  padding: 0 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 40;
+  background: linear-gradient(to bottom, var(--bg-color) 45%, transparent 100%);
+  pointer-events: none;
+}
+
+.header-brand, .header-nav, .header-right {
+  pointer-events: auto;
+}
+
+.header-brand {
+  text-decoration: none;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-sans {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.header-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-link {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--text-primary);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background-color: var(--text-primary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.header-back-btn:hover {
+  transform: translateX(-3px);
+}
+
+.header-back-btn.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+}
+
+.theme-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 3px;
+  transition: color 0.2s ease;
+}
+
+.theme-btn:hover {
+  color: var(--text-primary);
+}
+
+.theme-btn.active {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.theme-sep {
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   3. Bottom Status Footer
+   ========================================================================== */
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  padding: 0 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.bottom-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.meta-tag {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.bottom-divider {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.bottom-hint {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   4. Shared Section View Container
+   ========================================================================== */
+
+.section-view {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.section-view.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   5. OBJECTS — Scattered Editorial Index
+   ========================================================================== */
+
+.sandcastle-canvas {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 96px 40px 80px;
+  position: relative;
+}
+
+.sandcastle-center-title {
+  text-align: center;
+  margin: 24px 0 54px;
+}
+
+.sandcastle-center-title h2 {
+  font-family: var(--font-sans);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.sandcastle-filter-row {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.filter-chip {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-chip.active,
+.filter-chip:hover {
+  background: var(--text-primary);
+  color: var(--bg-color);
+  border-color: var(--text-primary);
+}
+
+.sandcastle-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 48px 36px;
+  align-items: start;
+}
+
+.sandcastle-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sandcastle-card.scatter-2 {
+  margin-top: 36px;
+}
+
+.sandcastle-card.scatter-3 {
+  margin-top: -10px;
+}
+
+.sandcastle-card.scatter-4 {
+  margin-top: 22px;
+}
+
+.sandcastle-card:hover {
+  transform: translateY(-5px);
+}
+
+.sc-img-wrap {
+  width: 100%;
+  background: var(--card-placeholder);
+  overflow: hidden;
+  border-radius: 0px;
+}
+
+.sc-img-wrap.aspect-4-5 { aspect-ratio: 4 / 5; }
+.sc-img-wrap.aspect-1-1 { aspect-ratio: 1 / 1; }
+.sc-img-wrap.aspect-3-4 { aspect-ratio: 3 / 4; }
+
+.sc-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.sandcastle-card:hover .sc-img-wrap img {
+  transform: scale(1.04);
+}
+
+.sc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sc-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.sc-sub {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   6. ART — Layered Editorial Collage Showcase
+   ========================================================================== */
+
+.collage-stage {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.collage-composition {
+  position: relative;
+  width: min(860px, 90vw);
+  height: min(620px, 76vh);
+}
+
+.collage-frame {
+  position: absolute;
+  overflow: hidden;
+  background: var(--card-placeholder);
+  cursor: pointer;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.collage-frame:hover {
+  transform: scale(1.04);
+  z-index: 12 !important;
+}
+
+.collage-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.collage-frame-label {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.62);
+  padding: 3px 8px;
+}
+
+.collage-frame.slot-top {
+  width: 28%;
+  height: 28%;
+  top: 0%;
+  left: 34%;
+  z-index: 1;
+}
+
+.collage-frame.slot-left {
+  width: 28%;
+  height: 30%;
+  top: 16%;
+  left: 14%;
+  z-index: 2;
+}
+
+.collage-frame.slot-beige {
+  width: 48%;
+  height: 55%;
+  top: 22%;
+  left: 34%;
+  z-index: 3;
+}
+
+.collage-frame.slot-center-main {
+  width: 56%;
+  height: 48%;
+  top: 46%;
+  left: 12%;
+  z-index: 4;
+}
+
+.collage-frame.slot-center-small {
+  width: 20%;
+  height: 18%;
+  top: 41%;
+  left: 46%;
+  z-index: 6;
+}
+
+.collage-frame.slot-bottom-right {
+  width: 20%;
+  height: 38%;
+  top: 64%;
+  left: 52%;
+  z-index: 7;
+}
+
+.collage-caption-bar {
+  position: absolute;
+  bottom: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  z-index: 15;
+}
+
+/* ==========================================================================
+   7. ABOUT — Minimal Statement Screen
+   ========================================================================== */
+
+.statement-stage {
+  width: 100%;
+  height: 100vh;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.statement-line {
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.statement-sub {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  max-width: 520px;
+}
+
+.statement-disciplines {
+  display: flex;
+  gap: 36px;
+  margin-top: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.statement-disciplines strong {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+.pill-return-btn {
+  margin-top: 14px;
+  background: var(--text-primary);
+  color: var(--bg-color);
+  border: none;
+  padding: 10px 24px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.pill-return-btn:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   8. Detail Lightbox Overlay
+   ========================================================================== */
+
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.detail-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.detail-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.detail-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.detail-top-meta {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-frame-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-img-box {
+  width: min(440px, 80vw);
+  height: min(480px, 58vh);
+  background: var(--card-placeholder);
+  overflow: hidden;
+}
+
+.detail-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.detail-heading-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.detail-clean-title {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.detail-bottom-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.detail-desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  max-width: 500px;
+}
+
+.detail-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.text-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.text-action-btn:hover {
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+   9. Custom Magnetic Cursor
+   ========================================================================== */
+
+#custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  margin-left: -5px;
+  pointer-events: none;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              margin 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+}
+
+#cursor-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--text-primary);
+}
+
+#cursor-label {
+  display: none;
+  color: var(--cursor-text);
+  font-family: var(--font-sans);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+#custom-cursor.is-hovering {
+  width: 46px;
+  height: 46px;
+  margin-top: -23px;
+  margin-left: -23px;
+  background-color: var(--cursor-bg);
+}
+
+#custom-cursor.is-hovering #cursor-dot {
+  display: none;
+}
+
+#custom-cursor.is-hovering #cursor-label {
+  display: block;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  #custom-cursor {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   10. Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .ui-header {
+    padding: 0 18px;
+  }
+
+  .header-nav {
+    gap: 16px;
+  }
+
+  .sandcastle-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 18px;
+  }
+
+  .bottom-hint {
+    display: none;
+  }
+
+  .statement-disciplines {
+    flex-direction: column;
+    gap: 14px;
+  }
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARCHIVE — Spatial Editorial Collection</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+
+  <!-- Single Clean Font Family: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="dark-theme">
+  <!-- Simple JS 3D 4-Row Funnel Gallery Stage -->
+  <div id="webgl-container"></div>
+
+  <!-- Custom Magnetic Cursor -->
+  <div id="custom-cursor">
+    <div id="cursor-dot"></div>
+    <span id="cursor-label">VIEW</span>
+  </div>
+
+  <!-- Unified Single-Font Header -->
+  <header class="ui-header">
+    <!-- Top Left: Clean Sans Wordmark -->
+    <a href="#work" class="header-brand" id="brand-home">
+      <span class="brand-sans">ARCHIVE</span>
+    </a>
+
+    <!-- Top Center: WORK  OBJECTS  ART  ABOUT (No brackets) -->
+    <nav class="header-nav" aria-label="Primary Navigation">
+      <a href="#work" class="nav-link active" data-target="work">WORK</a>
+      <a href="#objects" class="nav-link" data-target="objects">OBJECTS</a>
+      <a href="#art" class="nav-link" data-target="art">ART</a>
+      <a href="#about" class="nav-link" data-target="about">ABOUT</a>
+    </nav>
+
+    <!-- Top Right: Contextual <- BACK Button + B / W Theme Switcher -->
+    <div class="header-right">
+      <button id="header-back-btn" class="header-back-btn is-hidden" aria-label="Back to Funnel Gallery">
+        <span>&larr; BACK</span>
+      </button>
+
+      <div class="theme-switcher" role="group" aria-label="Theme Mode">
+        <button id="theme-btn-b" class="theme-btn active" title="Black Theme">B</button>
+        <span class="theme-sep">/</span>
+        <button id="theme-btn-w" class="theme-btn" title="White Light Theme">W</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subtle Bottom Status Bar (No brackets) -->
+  <footer class="bottom-bar">
+    <div class="bottom-left">
+      <span class="meta-tag">42 ARCHIVAL WORKS</span>
+      <span class="bottom-divider">&mdash;</span>
+      <span class="bottom-hint">SCROLL VERTICALLY TO DESCEND FUNNEL &bull; DRAG TO SPIN</span>
+    </div>
+    <div class="bottom-right">
+      <span class="meta-tag">35MM &amp; MEDIUM FORMAT</span>
+    </div>
+  </footer>
+
+  <!-- SECTION 1: OBJECTS — Scattered Editorial Index -->
+  <section id="objects-view" class="section-view">
+    <div class="sandcastle-canvas">
+      <div class="sandcastle-center-title">
+        <h2>Editorial Index</h2>
+        <div class="sandcastle-filter-row">
+          <button class="filter-chip active" data-filter="all">ALL WORKS</button>
+          <button class="filter-chip" data-filter="objects">OBJECTS</button>
+          <button class="filter-chip" data-filter="art">ART</button>
+        </div>
+      </div>
+
+      <div id="objs-grid" class="sandcastle-grid">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: ART — Layered Editorial Collage Showcase -->
+  <section id="art-view" class="section-view">
+    <div class="collage-stage">
+      <div id="collage-composition" class="collage-composition">
+        <!-- Layered overlapping editorial photographs injected via JS -->
+      </div>
+      <div class="collage-caption-bar">
+        <span>CLICK ANY IMAGE TO INSPECT</span>
+        <button id="collage-shuffle-btn" class="text-action-btn">NEXT CURATION &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: ABOUT — Minimal Statement Screen -->
+  <section id="about-view" class="section-view">
+    <div class="statement-stage">
+      <p class="statement-line">
+        This archive is an unedited, spatial output curated from 35mm field notes, nocturnal landscapes, and abyssal studies.
+      </p>
+      <p class="statement-sub">
+        Arranged across a four-tier tapering funnel, the collection pairs bioluminescent marine specimens, Indonesian maritime crossings, lunar silhouettes, and slow-shutter kinetic portraiture.
+      </p>
+      <div class="statement-disciplines">
+        <div><strong>ABYSSAL &amp; MARINE</strong></div>
+        <div><strong>ANALOG NOCTURNES</strong></div>
+        <div><strong>KINETIC PORTRAITURE</strong></div>
+      </div>
+      <button id="about-return-btn" class="pill-return-btn">&larr; RETURN TO FUNNEL</button>
+    </div>
+  </section>
+
+  <!-- PROJECT DETAIL OVERLAY — Clean Lightbox -->
+  <div id="detail-overlay" class="detail-overlay">
+    <div class="detail-backdrop" id="detail-backdrop"></div>
+
+    <div class="detail-stage">
+      <div class="detail-top-meta">
+        <span id="detail-subtitle" class="meta-tag"></span>
+        <button id="detail-close" class="text-action-btn">&larr; BACK TO ARCHIVE</button>
+      </div>
+
+      <div class="detail-frame-wrap">
+        <div class="detail-img-box">
+          <img id="detail-img" src="" alt="" />
+        </div>
+      </div>
+
+      <div class="detail-bottom-bar">
+        <div class="detail-heading-group">
+          <h3 id="detail-title" class="detail-clean-title"></h3>
+        </div>
+        <p id="detail-desc" class="detail-desc"></p>
+        <div class="detail-nav-controls">
+          <button id="detail-prev" class="text-action-btn">&larr; PREV</button>
+          <span id="detail-year" class="meta-tag">2024</span>
+          <button id="detail-next" class="text-action-btn">NEXT &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./bundle.js"></script>
+</body>
+</html>
