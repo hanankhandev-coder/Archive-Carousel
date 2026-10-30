@@ -1,3 +1,5 @@
+Live: https://hanankhandev-coder.github.io/Archive-Carousel/
+
 # ARCHIVE — 3D Circular Funnel & Editorial Visual Catalogue
 
 A full-viewport, hardware-accelerated **3D Circular Funnel Project Gallery** built with **Vite + Vanilla JavaScript + HTML5 + CSS 3D Transforms + GSAP** (zero Three.js/WebGL overhead). Inspired by the circular project funnel of **[Capitol Records](https://www.capitolrecords.com)** and minimalist editorial design archives, it pairs a 4-tier tapering 3D cylinder carousel with a scattered editorial index (`OBJECTS`), a layered visual composition showcase (`ART`), a minimal studio manifesto (`ABOUT`), and a dual Obsidian/Pure-White theme toggle (`B / W`).
